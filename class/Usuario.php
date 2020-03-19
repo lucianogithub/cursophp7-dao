@@ -49,6 +49,46 @@ class Usuario {
 		}
 	}
 
+	// NÃO USAMOS O THIS, ENTÃO PODE SER STATIC, qual a vantagem, pode-se chamar direto, sem a necessidade de instanciar, ex: dal::debugaVetor();
+	public static function getList()
+	{
+
+		$sql = new Sql();
+		$results = $sql->select("SELECT * FROM tb_usuarios ORDER BY deslogin;");
+		return $results;
+
+	}
+
+	public static function search($login)
+	{
+		$sql = new Sql();
+		$results = $sql->select("SELECT * FROM tb_usuarios WHERE deslogin LIKE :SEARCH  ORDER BY deslogin", array(
+			':SEARCH'=>$login."%"
+		));
+		return $results;
+	}
+
+	public function login($login, $password)
+	{
+		$sql = new Sql();
+		$results = $sql->select("SELECT * FROM tb_usuarios WHERE deslogin = :LOGIN AND dessenha = :PASSWORD", array(
+			":LOGIN"=>$login,
+			":PASSWORD"=>$password
+		));
+
+		if (count($results) > 0) {
+			$row = $results[0];
+
+			$this->setIdusuario($row['idusuario']);
+			$this->setDeslogin($row['deslogin']);
+			$this->setDessenha($row['dessenha']);
+			$this->setDtcadastro(new DateTime($row['dtcadastro']));
+		} else {
+			throw new Exception("Login e/ou senha inválidos");
+			
+		}
+	}
+
 	public function __toString()
 	{
 
